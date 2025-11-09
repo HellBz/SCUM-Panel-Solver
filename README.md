@@ -3,6 +3,9 @@
 A tool to automatically capture and solve the **SCUM** in-game electrical panels  
 using **screenshot recognition (OCR)** and an interactive solver.
 
+
+![Screenshot](img/Screenshot%202025-11-09%20190635.png)
+
 ---
 
 ## 🚀 Features
