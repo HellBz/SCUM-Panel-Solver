@@ -1,4 +1,4 @@
-# 🧩 SCUM Panel Solver Capture
+# 🧩 SCUM Panel Solver
 
 A tool to automatically capture and solve the **SCUM** in-game electrical panels  
 using **screenshot recognition (OCR)** and an interactive solver.
