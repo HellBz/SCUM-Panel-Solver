@@ -85,6 +85,7 @@ class Calibrator(tk.Tk):
         self.mode = None
         self.drag_rect = None
         self.temp_rect_start = None
+        self.show_help = True  # show help overlay initially
 
         self.load_calibration()
 
@@ -163,6 +164,10 @@ class Calibrator(tk.Tk):
         elif key == "r":
             self.mode = "op_right"
             print("🔴 Define Right Operator")
+        elif key == "h":
+            self.show_help = not self.show_help
+            print("ℹ️ Toggle help overlay:", self.show_help)
+            self._update_display()
         else:
             self.mode = None
 
@@ -235,6 +240,43 @@ class Calibrator(tk.Tk):
                 idx = i
         return idx
 
+    def _draw_help_overlay(self, img):
+        """Draw semi-transparent help overlay with key bindings and tips."""
+        overlay = img.copy()
+        x0, y0 = 20, 20
+        x1, y1 = 520, 360
+        cv2.rectangle(overlay, (x0, y0), (x1, y1), (30, 30, 30), -1)
+        cv2.addWeighted(overlay, 0.75, img, 0.25, 0, img)
+
+        lines = [
+            "Calibration Help (press H to hide/show)",
+            "",
+            "Open image: file dialog appears on start.",
+            "Reference screws detected automatically.",
+            "",
+            "Keys:",
+            "I → Input ROI (green box)",
+            "A → Output A ROI (red box)",
+            "B → Output B ROI (blue box)",
+            "L → Left operator (blue beside slots)",
+            "R → Right operator (red beside slots)",
+            "",
+            "Mouse:",
+            "Left-drag → draw ROI / move slot centers",
+            "Right-click → save calibration + overlay",
+            "",
+            "Files created:",
+            "calibration.json (used by main.py)",
+            "calibration_overlay.png (visual check)",
+        ]
+
+        y = y0 + 30
+        for i, t in enumerate(lines):
+            scale = 0.65 if i != 0 else 0.75
+            thick = 1 if i != 0 else 2
+            cv2.putText(img, t, (x0 + 20, y), cv2.FONT_HERSHEY_SIMPLEX, scale, (240, 240, 240), thick, cv2.LINE_AA)
+            y += 24 if i != 0 else 28
+
     def _update_display(self):
         img = self._draw_debug()
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -273,6 +315,9 @@ class Calibrator(tk.Tk):
                 x0,y0,x1,y1 = roi
                 cv2.rectangle(img, (x0,y0), (x1,y1), color, 2)
                 cv2.putText(img, name, (x0, y0-5), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+
+        if self.show_help:
+            self._draw_help_overlay(img)
 
         if self.drag_rect:
             x0,y0,x1,y1 = self.drag_rect
